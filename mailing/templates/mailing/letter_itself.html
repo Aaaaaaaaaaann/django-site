@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+{% block content %}
+<h2>Заголовок</h2>
+<p>Основной текст.</p>
+<a href="{% url 'mailing:unsubscribe' email %}">Отписаться</a>
+{% endblock %}
+</body>
+</html>

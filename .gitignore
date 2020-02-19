@@ -1,0 +1,11 @@
+.env
+__pycache__/
+static/
+.idea/
+bin/
+include/
+lib/
+lib64/
+*.cfg
+tests.py
+venv/

@@ -1,0 +1,120 @@
+{% extends 'notes/base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block title %}{{ note.author }} «{{ note.title }}»{% endblock %}
+
+{% block content %}
+<h1 class="mb-3">{{ note.author }} «{{ note.title }}»</h1>
+
+<hr width=100%>
+{{ note.issue|safe }}
+<hr width=100%>
+{{ note.body|safe }}
+
+<div class="tag-widget post-tag-container mb-5 mt-5">
+  <div class="tagcloud">
+    {% for tag in note.tags.all %}
+    <a href="{% url 'notes:notes_by_tag' tag.slug %}" class="tag-cloud-link">{{ tag }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="about-author d-flex p-4 bg-light">
+  <div class="desc">
+    <h3>— Читать ли мне эту книгу?</h3>
+    <hr>
+    {{ note.shouldRead|safe }}
+  </div>
+</div>
+
+<div class="pt-5 mt-5">
+  {% with comments.count as total_comments %}
+  {% if total_comments > 0 %}
+  <h4 class="mb-5 font-weight-bold">Комментарии</h4>
+  {% else %}
+  <h4 class="mb-5 font-weight-bold">Комментариев пока нет</h4>
+  {% endif %}
+  {% endwith %}
+
+  <ul class="comment-list">
+    {% for comment in comments %}
+    {% if not comment.parent %}
+    <li class="comment">
+      <div class="vcard bio">
+        <img src="{% static 'images/person_1.jpg' %}" alt="Image placeholder">
+      </div>
+      <div class="comment-body">
+        <h4>{{ comment.user }}</h4>
+        <div class="meta">{{ comment.added }}</div>
+        <p>{{ comment.body }}</p>
+        <p><a href="#commentForm" class="reply"
+            onclick="addAnswer('{{ comment.user }}', '{{ comment.pk }}', '{{ comment.pk }}')">Ответить</a></p>
+      </div>
+
+      {% for answer in comment.answers.all %}
+      <ul class="children">
+        <li class="comment">
+          <div class="vcard bio">
+            <img src="{% static 'images/person_1.jpg' %}" alt="Image placeholder">
+          </div>
+          <div class="comment-body">
+            <h4>{{ answer.user }}</h4>
+            <div class="meta">{{ answer.added }}</div>
+            <p>{{ answer.body }}</p>
+            <p><a href="#commentForm" class="reply"
+                onclick="addAnswer('{{ answer.user }}', '{{ comment.pk }}', '{{ answer.pk }}')">Ответить</a></p>
+          </div>
+        </li>
+      </ul>
+      {% endfor %}
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+
+  <div class="comment-form-wrap pt-5">
+    <h3 class="mb-5">Добавить комментарий</h3>
+    <form action="{% url 'notes:note_detail' note.slug %}" method="post" class="p-3 p-md-5 bg-light" id="commentForm">
+      {% csrf_token %}
+      <input type="hidden" name="parent" id="commentparent" value="">
+      <input type="hidden" name="answer_to" id="sendaswerto" value="">
+      <input type="hidden" name="note" value="{{ note.pk }}">
+      <div class="form-group">
+        <label for="username">Имя *</label>
+        <input type="text" class="form-control" id="username" name="user" required maxlength="30">
+        <small id="usernamehelp" class="form-text text-muted">Максимум 30 символов.</small>
+      </div>
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="message">Комментарий *</label>
+        <textarea name="body" id="message" cols="30" rows="10" class="form-control" required maxlength="500"></textarea>
+        <small id="bodyhelp" class="form-text text-muted">Максимум 500 символов.</small>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="iscalm" required>
+        <label class="form-check-label" for="iscalm">Я публикую этот комментарий, будучи в нейтральном эмоциональном состоянии. *</label>
+      </div>
+      <div class="form-check p-3">
+        <input type="checkbox" class="form-check-input" name="notification" id="notification">
+        <label class="form-check-label" for="notification">Сообщите, если мне ответят.</label>
+      </div>
+      <div class="form-group">
+        <input type="submit" value="Добавить" class="btn py-3 px-4 btn-primary">
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function addAnswer(user, pk1, pk2) {
+    document.getElementById("commentparent").value = pk1;
+    document.getElementById("sendaswerto").value = pk2;
+    document.getElementById("message").innerText = `${user}, `
+  }
+</script>
+
+{% endblock %}
