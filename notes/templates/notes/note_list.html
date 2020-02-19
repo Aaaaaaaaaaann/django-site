@@ -1,0 +1,53 @@
+{% extends 'notes/base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block title %}Нонфикшиновские книжные заметки{% endblock %}
+
+{% block content %}
+{% for note in notes %}
+<div class="col-md-12">
+	<div class="blog-entry ftco-animate d-md-flex">
+		{% if note.image %}
+		<a href="{{ note.get_absolute_url }}" class="img img-2"
+			style="background-image: url({{ note.image.url }});"></a>
+		{% endif %}
+		<div class="text text-2 pl-md-4">
+			<h3 class="mb-2"><a href="{{ note.get_absolute_url }}">{{ note.author }} «{{ note.title }}»</a></h3>
+			<div class="meta-wrap">
+				<p class="meta">
+					<span><i class="icon-calendar mr-2"></i>{{ note.year }}</span>
+					<span><a href="% url 'notes:notes_by_topic' topic.englishName %}"><i
+								class="icon-folder-o mr-2"></i>{{ note.topic }}</a></span>
+					<span><i class="icon-comment2 mr-2"></i>{{ note.comments.count }}</span>
+				</p>
+			</div>
+			<p class="mb-4">{{ note.description }}</p>
+			<p><a href="{{ note.get_absolute_url }}" class="btn-custom">Читать <span
+						class="ion-ios-arrow-forward"></span></a></p>
+		</div>
+	</div>
+</div>
+{% endfor %}
+
+<div class="row">
+	<div class="col">
+		<div class="block-27">
+			<ul>
+				{% if page.has_previous %}
+				<li><a href="?page={{ page.previous_page_number }}">&lt</a></li>
+				{% endif %}
+				{% if page %}
+				<li class="active"><span>{{ page }}</span></li>
+				{% endif %}
+				{% for page in page.paginator.num_pages %}
+				<li><a href="?page={{ page }}">{{ page }}</a></li>
+				{% endfor %}
+				{% if page.has_next %}
+				<li><a href="?page={{ page.next_page_number }}">&gt</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+</div>
+{% endblock %}
