@@ -10,6 +10,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+	<link rel="shortcut icon" href="{% static 'favicon1.ico' %}">
+
 	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Abril+Fatface&display=swap" rel="stylesheet">
@@ -40,11 +42,33 @@
 	<div id="colorlib-page">
 		<aside id="colorlib-aside" role="complementary" class="js-fullheight">
 			<nav id="colorlib-main-menu" role="navigation">
+				{% if request.get_full_path == '/notes/' %}
 				<ul>
 					<li class="colorlib-active"><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
 					<li><a href="{% url 'notes:about' %}">Обо мне</a></li>
 					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
 				</ul>
+
+				{% elif request.get_full_path == '/notes/by_subgenre/popular_science/' %}
+				<ul>
+					<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
+					<li class="colorlib-active"><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
+					<li><a href="{% url 'notes:about' %}">Обо мне</a></li>
+					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
+				</ul>
+
+				{% elif request.get_full_path == '/notes/by_subgenre/self-development/' %}
+				<ul>
+					<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
+					<li class="colorlib-active"><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
+					<li><a href="{% url 'notes:about' %}">Обо мне</a></li>
+					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
+				</ul>
+				{% endif %}
 			</nav>
 
 			<div class="colorlib-footer">
@@ -56,7 +80,7 @@
 					<form action="{% url 'mailing:subscribe' %}" method="post" class="colorlib-subscribe-form">
 						{% csrf_token %}
 						<div class="form-group d-flex">
-							<input type="email" class="form-control" placeholder="Введите email" name="email">
+							<input type="email" class="form-control" placeholder="Email" name="email">
 							<button class="btn"><span class="icon-paper-plane"></span></button>
 						</div>
 					</form>
@@ -126,7 +150,7 @@
 
 							<div class="sidebar-box ftco-animate">
 								<h3 class="sidebar-heading">Популярное</h3>
-								{% show_most_commented_notes as popular_notes %}
+								{% show_popular_notes as popular_notes %}
 								{% for note in popular_notes %}
 								<div class="block-21 mb-4 d-flex">
 									<a class="blog-img mr-4" style="background-image: url({{ note.image.url }});"></a>
@@ -155,6 +179,19 @@
 										class="tag-cloud-link">{{ tag.name }}</a>
 									{% endfor %}
 								</ul>
+							</div>
+
+							<div class="sidebar-box subs-wrap img py-4" style="background-image: url({% static 'images/bg_1.jpg' %});">
+								<div class="overlay"></div>
+								<h3 class="mb-4 sidebar-heading">Новости</h3>
+								<p class="mb-4">Здесь можно подписаться на новые публикации.</p>
+	                            <form action="{% url 'mailing:subscribe' %}" method="post" class="subscribe-form">
+									{% csrf_token %}
+	                              <div class="form-group">
+	                                <input type="email" class="form-control" placeholder="Email" name="email">
+	                                <input type="submit" value="Подписаться" class="mt-2 btn btn-white submit">
+	                              </div>
+	                            </form>
 							</div>
 
 							<div class="sidebar-box ftco-animate">

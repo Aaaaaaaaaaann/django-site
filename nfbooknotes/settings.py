@@ -150,7 +150,7 @@ TINYMCE_DEFAULT_CONFIG = {'theme': "advanced", 'relative_urls': False, 'width': 
 THUMBNAIL_ALIASES = {
     'notes.Note.image': {
         'default': {
-            'size': (250, 0),
+            'size': (0, 140),
             'crop': 'scale',
             'replace_alpha': '#‎FFFFFF',
             'quality': 100,

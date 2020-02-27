@@ -18,9 +18,10 @@ def invalidate_notes_related_caches(sender, instance, **kwargs):
         cache.delete_many(old_caches)
 
 
-@receiver([signals.post_save, signals.post_delete], sender=Comment)
+@receiver([signals.pre_save, signals.post_delete], sender=Comment)
 def invalidate_comments_cache(sender, instance, **kwargs):
-    cache.delete_many('comments_to_' + instance.note.slug, 'most_commented_notes')
+    if not instance.id:
+        cache.delete('comments_to_' + str(instance.note.pk))
 
 
 @receiver(signals.post_save, sender=Comment)

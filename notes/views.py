@@ -7,10 +7,26 @@ from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
-from .models import Topic, Note, Comment, Tag
+from .models import Topic, Note, Comment, Tag, ViewsQuantity
 from .forms import CommentForm, SearchForm, ContactForm
-from nfbooknotes import settings
+from .extras import make_picture
+
+
+def count_views(func):
+    def views_counter(self, **kwargs):
+        note = Note.objects.get(slug=self.kwargs['slug'])
+        try:
+            notes_views = ViewsQuantity.objects.get(note=note)
+        except ObjectDoesNotExist:
+            notes_views = ViewsQuantity(note=note)
+        finally:
+            notes_views.quantity += 1
+            notes_views.save()
+        return func(self, **kwargs)
+    return views_counter
 
 
 class AnnualNotesView(ListView):
@@ -33,12 +49,14 @@ class NoteDetailView(CreateView):
     form_class = CommentForm
     queryset = Note.objects.filter(active=True)
 
+    @count_views
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs['slug']
         note = Note.objects.get(slug=slug)
         context['note'] = note
-        context['comments'] = cache.get_or_set('comments_to_' + slug, note.comments.all())
+        context['comments'] = cache.get_or_set('comments_to_' + str(note.pk), note.comments.all())
+        context['views'] = ViewsQuantity.objects.get(note=note).quantity
         return context
 
     def form_valid(self, form):
@@ -49,6 +67,7 @@ class NoteDetailView(CreateView):
         if parent:
             comment.parent = Comment.objects.get(pk=parent)
             comment.answer_to = Comment.objects.get(pk=self.request.POST.get('answer_to', None))
+        comment.picture = make_picture(form.cleaned_data['user'])
         comment.save()
         messages.success(self.request, 'Комментарий добавлен.', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('notes:note_detail', kwargs={'slug': note.slug}))
@@ -105,6 +124,17 @@ class SendMailToAdminView(FormView):
         send_mail(subject, message, email, [email])
         messages.success(self.request, 'Сообщение отправлено.', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('notes:notes_list'))
+
+
+class SubgenreNotesView(ListView):
+    model = Note
+    queryset = Note.objects.filter(active=True)
+    paginate_by = 12
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['notes'] = Note.objects.filter(subgenre=self.kwargs['subgenre'])
+        return context
 
 
 def search(request):

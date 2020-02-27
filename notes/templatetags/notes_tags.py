@@ -2,6 +2,7 @@ from django import template
 from django.db.models import Count
 from django.db.models import F
 from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 
 from ..models import Topic, Note, Tag
 
@@ -19,10 +20,10 @@ def show_tags_list():
     return cache.get_or_set('tags_list', Tag.objects.all())
 
 
+@cache_page(86400)
 @register.simple_tag
-def show_most_commented_notes(count=3):
-    return cache.get_or_set('most_commented_notes',
-                            Note.objects.annotate(total_comments=Count('comments')).order_by('-total_comments')[:count])
+def show_popular_notes(count=3):
+    return Note.objects.annotate(total_views=Count('views_quantity')).order_by('-views_quantity')[:count]
 
 
 @register.simple_tag

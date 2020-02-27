@@ -17,7 +17,7 @@
 			<div class="meta-wrap">
 				<p class="meta">
 					<span><i class="icon-calendar mr-2"></i>{{ note.year }}</span>
-					<span><a href="% url 'notes:notes_by_topic' topic.englishName %}"><i
+					<span><a href="{% url 'notes:notes_by_topic' note.topic.slug %}"><i
 								class="icon-folder-o mr-2"></i>{{ note.topic }}</a></span>
 					<span><i class="icon-comment2 mr-2"></i>{{ note.comments.count }}</span>
 				</p>

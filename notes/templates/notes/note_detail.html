@@ -28,6 +28,8 @@
   </div>
 </div>
 
+<div class="mb-5 mt-5"><span class="icon-eye"> {{ views }}</span></div>
+
 <div class="pt-5 mt-5">
   {% with comments.count as total_comments %}
   {% if total_comments > 0 %}
@@ -42,7 +44,9 @@
     {% if not comment.parent %}
     <li class="comment">
       <div class="vcard bio">
-        <img src="{% static 'images/person_1.jpg' %}" alt="Image placeholder">
+        {% if comment.picture %}
+        <img src="{{ comment.picture.url }}" alt="Image placeholder">
+        {% endif %}
       </div>
       <div class="comment-body">
         <h4>{{ comment.user }}</h4>
@@ -56,7 +60,9 @@
       <ul class="children">
         <li class="comment">
           <div class="vcard bio">
-            <img src="{% static 'images/person_1.jpg' %}" alt="Image placeholder">
+            {% if answer.picture %}
+            <img src="{{ answer.picture.url }}" alt="Image placeholder">
+            {% endif %}
           </div>
           <div class="comment-body">
             <h4>{{ answer.user }}</h4>

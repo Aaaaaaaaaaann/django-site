@@ -10,6 +10,7 @@ urlpatterns = [
     path('contact/', views.SendMailToAdminView.as_view(), name='contact'),
     path('about', TemplateView.as_view(template_name='notes/about.html'), name='about'),
     path('<slug:slug>/', views.NoteDetailView.as_view(), name='note_detail'),
+    path('by_subgenre/<str:subgenre>/', views.SubgenreNotesView.as_view(), name='notes_by_subgenre'),
     path('by_topic/<slug:slug>/', views.TopicalNotesView.as_view(), name='notes_by_topic'),
     path('by_tag/<slug:slug>/', views.TaggableNotesView.as_view(), name='notes_by_tag'),
     path('by_year/<int:year>/', views.AnnualNotesView.as_view(), name='notes_by_year'),

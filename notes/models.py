@@ -5,7 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import RegexValidator
 
-from .extras import translated_slugify
+from .extras import translate_and_slugify
 
 
 class Topic(models.Model):
@@ -20,13 +20,13 @@ class Topic(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.slug = translated_slugify(self.name)
+            self.slug = translate_and_slugify(self.name)
         super().save(self, *args, **kwargs)
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=20)
-    slug = models.SlugField(max_length=20)
+    slug = models.SlugField(max_length=20, null=True, blank=True)
 
     class Meta:
         ordering = ['name']
@@ -36,7 +36,7 @@ class Tag(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.slug = translated_slugify(self.name)
+            self.slug = translate_and_slugify(self.name)
         super().save(self, *args, **kwargs)
 
 
@@ -44,8 +44,10 @@ class Note(models.Model):
     title = models.CharField(max_length=150)
     author = models.CharField(max_length=50)
     slug = models.SlugField(max_length=200)
+    subgenre = models.CharField(max_length=20, null=True, choices=(('popular_science', 'Научпоп'),
+                                                                   ('self-development', 'Саморазвитие')))
     topic = models.ForeignKey(Topic, on_delete=models.PROTECT, related_name='notes')
-    image = ThumbnailerImageField(upload_to='notes/', null=True, resize_source={'size': (300, 0), 'crop': 'scale'})
+    image = ThumbnailerImageField(upload_to='notes/', null=True, resize_source={'size': (0, 140), 'crop': 'scale'})
     description = models.TextField(max_length=200)
     issue = HTMLField()
     year = models.IntegerField(validators=[RegexValidator(regex='\d{4}')])
@@ -70,6 +72,7 @@ class Comment(models.Model):
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='answers')
     answer_to = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='get_answer_from')
     user = models.CharField(max_length=30)
+    picture = models.ImageField(upload_to='users/', null=True)
     email = models.EmailField()
     body = models.TextField(max_length=500)
     added = models.DateTimeField(auto_now_add=True)
@@ -80,3 +83,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.user}: «{self.body}...»'
+
+
+class ViewsQuantity(models.Model):
+    note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='views_quantity')
+    quantity = models.IntegerField(default=0)
