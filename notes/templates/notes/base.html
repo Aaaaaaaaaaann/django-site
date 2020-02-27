@@ -51,7 +51,7 @@
 					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
 				</ul>
 
-				{% elif request.get_full_path == '/notes/by_subgenre/popular_science/' %}
+				{% elif request.get_full_path == '/notes/by_subgenre/popular_science/' or note.subgenre == 'popular_science' %}
 				<ul>
 					<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
 					<li class="colorlib-active"><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
@@ -60,7 +60,7 @@
 					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
 				</ul>
 
-				{% elif request.get_full_path == '/notes/by_subgenre/self-development/' %}
+				{% elif request.get_full_path == '/notes/by_subgenre/self-development/' or note.subgenre == 'self-development' %}
 				<ul>
 					<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
 					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>

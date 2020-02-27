@@ -4,7 +4,7 @@ from django.db.models import F
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
-from ..models import Topic, Note, Tag
+from ..models import Topic, Note, Tag, ViewsQuantity
 
 register = template.Library()
 
@@ -23,7 +23,9 @@ def show_tags_list():
 @cache_page(86400)
 @register.simple_tag
 def show_popular_notes(count=3):
-    return Note.objects.annotate(total_views=Count('views_quantity')).order_by('-views_quantity')[:count]
+    views = ViewsQuantity.objects.order_by('-quantity')[:count]
+    notes = [Note.objects.get(pk=view.note_id) for view in views]
+    return notes
 
 
 @register.simple_tag
