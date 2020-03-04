@@ -14,4 +14,6 @@ urlpatterns = [
     path('by_topic/<slug:slug>/', views.TopicalNotesView.as_view(), name='notes_by_topic'),
     path('by_tag/<slug:slug>/', views.TaggableNotesView.as_view(), name='notes_by_tag'),
     path('by_year/<int:year>/', views.AnnualNotesView.as_view(), name='notes_by_year'),
+    path('by_author/<str:authorAsSlug>/', views.AuthorsNotesView.as_view(), name='notes_by_author'),
+    path('unsubscribe_from_answers/<str:email>/', views.unsubscribe_from_answers, name='unsubscribe_from_answers'),
 ]

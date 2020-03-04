@@ -41,6 +41,8 @@
 		<nav id="colorlib-main-menu" role="navigation">
 			<ul>
 				<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
+				<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
+				<li><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
 				<li class="colorlib-active"><a href="about.html">Обо мне</a></li>
 				<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
 			</ul>

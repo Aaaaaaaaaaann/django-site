@@ -1,6 +1,7 @@
 {% load notes_tags %}
 {% load static %}
 {% load thumbnail %}
+{% load cache %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -65,6 +66,15 @@
 					<li><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
 					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
 					<li class="colorlib-active"><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
+					<li><a href="{% url 'notes:about' %}">Обо мне</a></li>
+					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
+				</ul>
+
+				{% else %}
+				<ul>
+					<li class="colorlib-active"><a href="{% url 'notes:notes_list' %}">Все заметки</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='popular_science' %}">Научпоп</a></li>
+					<li><a href="{% url 'notes:notes_by_subgenre' subgenre='self-development' %}">Саморазвитие</a></li>
 					<li><a href="{% url 'notes:about' %}">Обо мне</a></li>
 					<li><a href="{% url 'notes:contact' %}">Связаться</a></li>
 				</ul>
@@ -137,6 +147,7 @@
 									мне интересными. Надеюсь, какие-то из этих книг вы решите прочитать полностью.</p>
 							</div>
 
+							{% cache 86400 rightblock %}
 							<div class="sidebar-box ftco-animate">
 								<h3 class="sidebar-heading">Темы</h3>
 								<ul class="categories">
@@ -158,12 +169,11 @@
 										<h3 class="heading"><a href="{{ note.get_absolute_url }}">{{ note.title }}</a>
 										</h3>
 										<div class="meta">
-											<div><a href="{{ note.get_absolute_url }}"><span
+											<div><a href="{% url 'notes:notes_by_year' note.year %}"><span
 														class="icon-calendar"></span> {{ note.year }}</a></div>
-											<div><a href="{{ note.get_absolute_url }}"><span class="icon-person"></span>
+											<div><a href="{% url 'notes:notes_by_author' note.authorAsSlug %}"><span class="icon-person"></span>
 													{{ note.author }}</a></div>
-											<div><a href="{{ note.get_absolute_url }}"><span class="icon-chat"></span>
-													{{ note.comments.count }}</a></div>
+											<div><span class="icon-chat"></span> {{ note.comments.count }}</a></div>
 										</div>
 									</div>
 								</div>
@@ -204,6 +214,7 @@
 									{% endfor %}
 								</ul>
 							</div>
+							{% endcache %}
 
 						</div><!-- END COL -->
 					</div>

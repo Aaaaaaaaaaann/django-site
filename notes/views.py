@@ -6,11 +6,11 @@ from django.views.generic.edit import CreateView, FormView
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 from django.conf import settings
 
-from .models import Topic, Note, Comment, Tag, ViewsQuantity
+from .models import Topic, Note, Comment, ViewsQuantity
 from .forms import CommentForm, SearchForm, ContactForm
 from .extras import make_picture
 
@@ -32,15 +32,19 @@ def count_views(func):
 class AnnualNotesView(ListView):
     template_name = 'notes/note_list.html'
     context_object_name = 'notes'
+    paginate_by = 12
 
     def get_queryset(self):
-        year = self.kwargs['year']
-        return cache.get_or_set('notes_by_year_' + str(year), Note.objects.filter(year=year))
+        return Note.objects.filter(year=self.kwargs['year'])
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['year'] = self.kwargs['year']
-        return context
+
+class AuthorsNotesView(ListView):
+    template_name = 'notes/note_list.html'
+    context_object_name = 'notes'
+    paginate_by = 12
+
+    def get_queryset(self):
+        return Note.objects.filter(authorAsSlug=self.kwargs['authorAsSlug'])
 
 
 class NoteDetailView(CreateView):
@@ -55,7 +59,7 @@ class NoteDetailView(CreateView):
         slug = self.kwargs['slug']
         note = Note.objects.get(slug=slug)
         context['note'] = note
-        context['comments'] = cache.get_or_set('comments_to_' + str(note.pk), note.comments.all())
+        context['comments'] = note.comments.all()
         context['views'] = ViewsQuantity.objects.get(note=note).quantity
         return context
 
@@ -75,41 +79,26 @@ class NoteDetailView(CreateView):
 
 class NotesView(ListView):
     model = Note
-    queryset = Note.objects.filter(active=True)
     context_object_name = 'notes'
     paginate_by = 12
-
-    def get_queryset(self):
-        return cache.get_or_set('all_active_notes', self.queryset)
 
 
 class TaggableNotesView(ListView):
     template_name = 'notes/note_list.html'
     context_object_name = 'notes'
+    paginate_by = 12
 
     def get_queryset(self):
-        tag = self.kwargs['slug']
-        return cache.get_or_set('notes_by_tag_' + tag, Note.objects.filter(tags__slug__in=[tag]))
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tag'] = Tag.objects.get(slug=self.kwargs['slug'])
-        return context
+        return Note.objects.filter(tags__slug__in=[self.kwargs['slug']])
 
 
 class TopicalNotesView(ListView):
     template_name = 'notes/note_list.html'
     context_object_name = 'notes'
+    paginate_by = 12
 
     def get_queryset(self):
-        slug = self.kwargs['slug']
-        topic = Topic.objects.get(slug=slug)
-        return cache.get_or_set('notes_by_topic_' + slug, topic.notes.all())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['topic'] = Topic.objects.get(slug=self.kwargs['slug'])
-        return context
+        return Topic.objects.get(slug=self.kwargs['slug']).notes.all()
 
 
 class SendMailToAdminView(FormView):
@@ -127,14 +116,12 @@ class SendMailToAdminView(FormView):
 
 
 class SubgenreNotesView(ListView):
-    model = Note
-    queryset = Note.objects.filter(active=True)
+    template_name = 'notes/note_list.html'
+    context_object_name = 'notes'
     paginate_by = 12
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['notes'] = Note.objects.filter(subgenre=self.kwargs['subgenre'])
-        return context
+    def get_queryset(self):
+        return Note.objects.filter(subgenre=self.kwargs['subgenre'])
 
 
 def search(request):
@@ -146,7 +133,18 @@ def search(request):
                      SearchVector('body', weight='B')
             results = Note.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.3).order_by('-rank')
             if results:
-                context = {'notes': results}
+                paginator = Paginator(results, 12)
+                page_number = request.GET.get('page')
+                page_content = paginator.get_page(page_number)
+                context = {'notes': page_content}
                 return render(request, 'notes/note_list.html', context)
             else:
                 return render(request, 'notes/not_found.html')
+
+
+def unsubscribe_from_answers(request, email):
+    users = Comment.objects.filter(email=email)
+    for user in users:
+        if user.notification:
+            user.notification = False
+    return render(request, 'mailing/unsubscribed.html')

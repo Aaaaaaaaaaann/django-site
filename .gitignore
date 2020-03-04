@@ -10,3 +10,4 @@ lib64/
 tests.py
 venv/
 test.html
+*.log

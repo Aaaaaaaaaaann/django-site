@@ -18,7 +18,7 @@ class NoteAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'topic', 'year', 'active')
     list_filter = ('title', 'author', 'topic', 'active')
     search_fields = ('title', 'author')
-    prepopulated_fields = {'slug': ('author', 'title')}
+    prepopulated_fields = {'slug': ('author', 'title'), 'authorAsSlug': ('author',)}
     list_editable = ('active',)
     ordering = ('title',)
 

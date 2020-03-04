@@ -40,14 +40,20 @@ class Tag(models.Model):
         super().save(self, *args, **kwargs)
 
 
+class NoteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+
+
 class Note(models.Model):
     title = models.CharField(max_length=150)
     author = models.CharField(max_length=50)
     slug = models.SlugField(max_length=200)
+    authorAsSlug = models.SlugField(max_length=50, null=True)
     subgenre = models.CharField(max_length=20, null=True, choices=(('popular_science', 'Научпоп'),
                                                                    ('self-development', 'Саморазвитие')))
     topic = models.ForeignKey(Topic, on_delete=models.PROTECT, related_name='notes')
-    image = ThumbnailerImageField(upload_to='notes/', null=True, resize_source={'size': (0, 140), 'crop': 'scale'})
+    image = ThumbnailerImageField(upload_to='notes/', null=True, resize_source={'size': (0, 170), 'crop': 'scale'})
     description = models.TextField(max_length=200)
     issue = HTMLField()
     year = models.IntegerField(validators=[RegexValidator(regex='\d{4}')])
@@ -55,6 +61,8 @@ class Note(models.Model):
     shouldRead = HTMLField(null=True, unique=True)
     active = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, blank=True, related_name='tags')
+
+    objects = NoteManager()
 
     class Meta:
         ordering = ['-year', 'title']

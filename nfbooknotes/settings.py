@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from dotenv import load_dotenv
+import logging
+
 
 load_dotenv()
 
@@ -150,13 +152,15 @@ TINYMCE_DEFAULT_CONFIG = {'theme': "advanced", 'relative_urls': False, 'width': 
 THUMBNAIL_ALIASES = {
     'notes.Note.image': {
         'default': {
-            'size': (0, 140),
+            'size': (0, 170),
             'crop': 'scale',
             'replace_alpha': '#‎FFFFFF',
             'quality': 100,
         }
     }
 }
+
+THUMBNAIL_EXTENSION = 'PNG'
 
 
 # Email
@@ -179,11 +183,22 @@ CAPTCHA_FOREGROUND_COLOR = '#1EAFED'
 CAPTCHA_IMAGE_SIZE = (150, 50)
 
 
-# Cache
+# Logging
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211'
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/logging_booknotes.log'
+        },
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG'
+        },
+    },
+    'root': {
+        'handlers': ['file'],
     }
 }

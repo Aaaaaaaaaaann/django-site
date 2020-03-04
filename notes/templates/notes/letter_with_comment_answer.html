@@ -8,7 +8,7 @@
 <p>Вы оставляли комментарий на сайте книжных заметок. {{ instance.user }} ответил:</p>
 <p>{{ instance.body }}</p>
 <p></p>
-<a href="{% url 'mailing:unsubscribe' instance.email %}">Отписаться</a>
+<a href="{% url 'notes:unsubscribe_from_answers' instance.email %}">Отписаться</a>
 {% endblock %}
 </body>
 </html>

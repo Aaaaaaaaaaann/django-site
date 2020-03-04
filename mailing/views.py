@@ -14,9 +14,8 @@ from .models import Follower
 
 
 def send_confirmation(recipient):
-    host = 'http//127.0.0.1.8000'
     subject = 'Подтверждение подписки'
-    message = render_to_string('mailing/confirm_email.html', {'sign': signing.dumps(recipient), host: 'host'})
+    message = render_to_string('mailing/confirm_email.html', {'sign': signing.dumps(recipient)})
     sender = settings.EMAIL_HOST_USER
     letter = mail.EmailMessage(subject, message, sender, [recipient])
     letter.content_subtype = 'html'
@@ -68,9 +67,7 @@ def unsubscribe(request, email):
     if follower.activated:
         follower.activated = False
         follower.save()
-        return render(request, 'mailing/unsubscribed.html')
-    else:
-        return render(request, 'mailing/unsubscribed.html')
+    return render(request, 'mailing/unsubscribed.html')
 
 
 def send_letter(subject):

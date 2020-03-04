@@ -6,7 +6,7 @@
 <body>
 {% block content %}
 <p>Спасибо за подписку!</p>
-<p>Осталось только <a href="{{ host }}{% url 'mailing:activate' sign %}">подтвердить её</a>.</p>
+<p>Осталось только <a href="{% url 'mailing:activate' sign %}">подтвердить её</a>.</p>
 <p></p>
 <p>(Ссылка действует сутки. Если вы не успели перейти по ней, то введите email <a href="{% url 'notes:notes_list' %}"> в форму на сайте</a> ещё раз.)</p>
 {% endblock %}
