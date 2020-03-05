@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'notes.apps.NotesConfig',
     'mailing.apps.MailingConfig',
+    'api.apps.ApiConfig',
     'tinymce',
     'easy_thumbnails',
     'captcha',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

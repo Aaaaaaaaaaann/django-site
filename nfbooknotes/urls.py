@@ -24,6 +24,7 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('notes/', include('notes.urls', namespace='notes')),
     path('mailing/', include('mailing.urls', namespace='mailing')),
+    path('api/', include('api.urls', namespace='api')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -60,7 +60,7 @@ class Note(models.Model):
     body = HTMLField(null=True, blank=True)
     shouldRead = HTMLField(null=True, unique=True)
     active = models.BooleanField(default=False)
-    tags = models.ManyToManyField(Tag, blank=True, related_name='tags')
+    tags = models.ManyToManyField(Tag, blank=True, related_name='notes')
 
     objects = NoteManager()
 
