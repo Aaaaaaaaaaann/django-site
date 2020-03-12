@@ -59,7 +59,7 @@ class NoteDetailView(CreateView):
         slug = self.kwargs['slug']
         note = Note.objects.get(slug=slug)
         context['note'] = note
-        context['comments'] = note.comments.all()
+        context['comments'] = note.comments.filter(parent=None)
         context['views'] = ViewsQuantity.objects.get(note=note).quantity
         return context
 
@@ -70,14 +70,14 @@ class NoteDetailView(CreateView):
         parent = self.request.POST.get('parent', None)
         if parent:
             comment.parent = Comment.objects.get(pk=parent)
-            comment.answer_to = Comment.objects.get(pk=self.request.POST.get('answer_to', None))
+            comment.answerTo = Comment.objects.get(pk=self.request.POST.get('answerTo', None))
         comment.picture = make_picture(form.cleaned_data['user'])
         comment.save()
         messages.success(self.request, 'Комментарий добавлен.', extra_tags='alert alert-success')
         return HttpResponseRedirect(reverse('notes:note_detail', kwargs={'slug': note.slug}))
 
 
-class NotesView(ListView):
+class NotesListView(ListView):
     model = Note
     context_object_name = 'notes'
     paginate_by = 12
@@ -145,6 +145,6 @@ def search(request):
 def unsubscribe_from_answers(request, email):
     users = Comment.objects.filter(email=email)
     for user in users:
-        if user.notification:
-            user.notification = False
+        if user.notifications:
+            user.notifications = False
     return render(request, 'mailing/unsubscribed.html')

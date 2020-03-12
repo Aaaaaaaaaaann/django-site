@@ -1,7 +1,6 @@
 from django import template
 from django.db.models import Count
 from django.db.models import F
-from django.core.cache import cache
 
 from ..models import Topic, Note, Tag, ViewsQuantity
 

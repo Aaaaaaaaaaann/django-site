@@ -25,7 +25,7 @@ class NoteAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'note', 'user', 'body'[:15], 'parent', 'answer_to', 'added', 'notification')
+    list_display = ('pk', 'note', 'user', 'body'[:15], 'parent', 'answerTo', 'added', 'notifications')
     list_filter = ('note', 'added')
     list_display_links = ('body'[:15],)
     ordering = ('-added',)

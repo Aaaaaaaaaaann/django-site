@@ -9,7 +9,7 @@ from .models import Comment
 
 @receiver(signals.post_save, sender=Comment)
 def send_email_with_comment_answer(sender, instance, **kwargs):
-    if instance.answer_to.notification:
+    if instance.answer_to.notifications:
         subject = 'На ваш комментарий ответили'
         message = render_to_string('notes/letter_with_comment_answer.html', {'instance': instance})
         sender = settings.EMAIL_HOST_USER

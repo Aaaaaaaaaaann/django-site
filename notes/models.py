@@ -78,13 +78,13 @@ class Note(models.Model):
 class Comment(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE, related_name='comments')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='answers')
-    answer_to = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='get_answer_from')
+    answerTo = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='get_answer_from')
     user = models.CharField(max_length=30)
     picture = models.ImageField(upload_to='users/', null=True)
     email = models.EmailField()
     body = models.TextField(max_length=500)
     added = models.DateTimeField(auto_now_add=True)
-    notification = models.BooleanField(default=False)
+    notifications = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('added',)

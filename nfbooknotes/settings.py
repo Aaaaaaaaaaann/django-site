@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'notes.apps.NotesConfig',
     'mailing.apps.MailingConfig',
     'api.apps.ApiConfig',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'captcha',
     'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -203,4 +205,14 @@ LOGGING = {
     'root': {
         'handlers': ['file'],
     }
+}
+
+
+# DRF
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASS': 'rest_framework.throttling.AnonRateThrottle',
+    'DEFAULT_THROTTLE_RATES': {'anon': '20/hour'},
 }
